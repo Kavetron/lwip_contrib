@@ -90,12 +90,12 @@ low_level_init(struct netif *netif)
   mintapif = netif->state;
   
   /* Obtain MAC address from network interface. */
-  mintapif->ethaddr->addr[0] = 1;
-  mintapif->ethaddr->addr[1] = 2;
-  mintapif->ethaddr->addr[2] = 3;
-  mintapif->ethaddr->addr[3] = 4;
-  mintapif->ethaddr->addr[4] = 5;
-  mintapif->ethaddr->addr[5] = 6;
+  mintapif->ethaddr->addr[0] = 0xf0;
+  mintapif->ethaddr->addr[1] = 0xde;
+  mintapif->ethaddr->addr[2] = 0xf1;
+  mintapif->ethaddr->addr[3] = 0x3c;
+  mintapif->ethaddr->addr[4] = 0x34;
+  mintapif->ethaddr->addr[5] = 0xc3;
 
   /* device capabilities */
   /* don't set NETIF_FLAG_ETHARP if this device is not an ethernet one */

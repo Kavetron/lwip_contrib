@@ -48,7 +48,7 @@
  * NO_SYS==1: Provides VERY minimal functionality. Otherwise,
  * use lwIP facilities.
  */
-#define NO_SYS                          1
+#define NO_SYS                          0
 
 
 /*
@@ -124,7 +124,7 @@
 /**
  * MEMP_NUM_SYS_TIMEOUT: the number of simulateously active timeouts.
  */
-#define MEMP_NUM_SYS_TIMEOUT            3
+#define MEMP_NUM_SYS_TIMEOUT            10
 
 /**
  * MEMP_NUM_NETBUF: the number of struct netbufs.
@@ -391,5 +391,72 @@
 #define LWIP_STATS                      0
 
 /* Misc */
+
+
+#define PPP_DEBUG LWIP_DBG_ON
+
+
+
+/*
+   ---------------------------------
+   ---------- PPP options ----------
+   ---------------------------------
+*/
+/**
+ * PPP_SUPPORT==1: Enable PPP.
+ */
+#define PPP_SUPPORT                     1
+
+/**
+ * PPPOE_SUPPORT==1: Enable PPP Over Ethernet
+ */
+#define PPPOE_SUPPORT                   1
+
+/**
+ * PPPOS_SUPPORT==1: Enable PPP Over Serial
+ */
+#define PPPOS_SUPPORT                   0
+
+
+/**
+ * NUM_PPP: Max PPP sessions.
+ */
+#define NUM_PPP                         1
+
+/**
+ * PAP_SUPPORT==1: Support PAP.
+ */
+#define PAP_SUPPORT                     0
+
+/**
+ * CHAP_SUPPORT==1: Support CHAP.
+ */
+#define CHAP_SUPPORT                    0
+
+/**
+ * MSCHAP_SUPPORT==1: Support MSCHAP. CURRENTLY NOT SUPPORTED! DO NOT SET!
+ */
+#define MSCHAP_SUPPORT                  0
+
+/**
+ * CBCP_SUPPORT==1: Support CBCP. CURRENTLY NOT SUPPORTED! DO NOT SET!
+ */
+#define CBCP_SUPPORT			0
+
+/**
+ * CCP_SUPPORT==1: Support CCP. CURRENTLY NOT SUPPORTED! DO NOT SET!
+ */
+#define CCP_SUPPORT                     0
+
+/**
+ * VJ_SUPPORT==1: Support VJ header compression.
+ */
+#define VJ_SUPPORT                      0
+
+/**
+ * MD5_SUPPORT==1: Support MD5 (see also CHAP).
+ */
+#define MD5_SUPPORT                     1
+
 
 #endif /* __LWIPOPTS_H__ */

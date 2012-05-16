@@ -34,8 +34,11 @@ CC=gcc
 #To compile for linux: make ARCH=linux
 #To compile for cygwin: make ARCH=cygwin
 #To compile for openbsd: make ARCH=openbsd
-ARCH=openbsd
-CFLAGS=-g -Wall -pedantic -D$(ARCH) -DIPv4 -Os -fpack-struct -DLWIP_DEBUG
+#ARCH=openbsd
+ARCH=linux
+#CFLAGS=-g -Wall -pedantic -D$(ARCH) -DIPv4 -Os -fpack-struct -DLWIP_DEBUG -lpthread 
+#CFLAGS=-g -Wall -D$(ARCH) -DIPv4 -Os -fpack-struct -DLWIP_DEBUG -lpthread -ldl -lcrypt -DHAVE_PATHS_H -DIPX_CHANGE -DHAVE_MMAP -DCHAPMS=1 -DMPPE=1 -DHAS_SHADOW -DHAVE_CRYPT_H=1 -DUSE_CRYPT=1 -DHAVE_MULTILINK -DUSE_TDB=1 -DPLUGIN -DMAXOCTETS -DDESTDIR="/usr/local"
+CFLAGS=-ggdb -Wall -D$(ARCH) -DIPv4 -Os -DLWIP_DEBUG -DDEBUGALL -lpthread -ldl -lcrypt -DHAVE_PATHS_H -DIPX_CHANGE -DHAVE_MMAP -DCHAPMS=1 -DMPPE=1 -DHAS_SHADOW -DHAVE_CRYPT_H=1 -DUSE_CRYPT=1 -DHAVE_MULTILINK -DUSE_TDB=1 -DPLUGIN -DMAXOCTETS -DDESTDIR="/usr/local"
 ARFLAGS=rs
 
 CONTRIBDIR=../../../..
@@ -47,7 +50,8 @@ LWIPDIR=$(CONTRIBDIR)/../lwip/src
 
 CFLAGS:=$(CFLAGS) \
 	-I$(LWIPDIR)/include -I$(LWIPARCH)/include -I$(LWIPDIR)/include/ipv4 \
-	-I$(LWIPDIR)/include/ipv6 -I. -I$(CONTRIBDIR)/apps/snmp_private_mib
+	-I$(LWIPDIR)/include/ipv6 -I. -I$(CONTRIBDIR)/apps/snmp_private_mib \
+	-I$(LWIPDIR)/netif/ppp/
 
 # COREFILES, CORE4FILES: The minimum set of files needed for lwIP.
 COREFILES=$(LWIPDIR)/core/def.c $(LWIPDIR)/core/dhcp.c $(LWIPDIR)/core/dns.c \
@@ -55,7 +59,8 @@ COREFILES=$(LWIPDIR)/core/def.c $(LWIPDIR)/core/dhcp.c $(LWIPDIR)/core/dns.c \
 	$(LWIPDIR)/core/memp.c $(LWIPDIR)/core/netif.c $(LWIPDIR)/core/pbuf.c \
 	$(LWIPDIR)/core/raw.c $(LWIPDIR)/core/stats.c $(LWIPDIR)/core/sys.c \
 	$(LWIPDIR)/core/tcp.c $(LWIPDIR)/core/tcp_in.c $(LWIPDIR)/core/tcp_in.c \
-	$(LWIPDIR)/core/tcp_out.c $(LWIPDIR)/core/timers.c $(LWIPDIR)/core/udp.c
+	$(LWIPDIR)/core/tcp_out.c $(LWIPDIR)/core/timers.c $(LWIPDIR)/core/udp.c \
+	$(LWIPDIR)/api/tcpip.c
 CORE4FILES=$(LWIPDIR)/core/ipv4/autoip.c $(LWIPDIR)/core/ipv4/icmp.c \
 	$(LWIPDIR)/core/ipv4/igmp.c $(LWIPDIR)/core/ipv4/ip_frag.c \
 	$(LWIPDIR)/core/ipv4/ip4.c $(LWIPDIR)/core/ipv4/ip4_addr.c
@@ -63,6 +68,38 @@ CORE6FILES=$(LWIPDIR)/core/ipv6/dhcp6.c $(LWIPDIR)/core/ipv6/ethip6.c \
 	$(LWIPDIR)/core/ipv6/icmp6.c $(LWIPDIR)/core/ipv6/ip6.c \
 	$(LWIPDIR)/core/ipv6/ip6_addr.c $(LWIPDIR)/core/ipv6/ip6_frag.c \
 	$(LWIPDIR)/core/ipv6/mld6.c $(LWIPDIR)/core/ipv6/nd6.c
+
+PPPFILES= $(LWIPDIR)/netif/ppp/magic.c \
+  $(LWIPDIR)/netif/ppp/fsm.c \
+  $(LWIPDIR)/netif/ppp/lcp.c \
+  $(LWIPDIR)/netif/ppp/ipcp.c \
+  $(LWIPDIR)/netif/ppp/upap.c \
+  $(LWIPDIR)/netif/ppp/chap-new.c \
+  $(LWIPDIR)/netif/ppp/md5.c \
+  $(LWIPDIR)/netif/ppp/ccp.c \
+  $(LWIPDIR)/netif/ppp/ecp.c \
+  $(LWIPDIR)/netif/ppp/auth.c \
+  $(LWIPDIR)/netif/ppp/options.c \
+  $(LWIPDIR)/netif/ppp/demand.c \
+  $(LWIPDIR)/netif/ppp/utils.c \
+  $(LWIPDIR)/netif/ppp/ipxcp.c \
+  $(LWIPDIR)/netif/ppp/tty.c \
+  $(LWIPDIR)/netif/ppp/eap.c \
+  $(LWIPDIR)/netif/ppp/chap-md5.c \
+  $(LWIPDIR)/netif/ppp/session.c \
+  $(LWIPDIR)/netif/ppp/md4.c \
+  $(LWIPDIR)/netif/ppp/chap_ms.c \
+  $(LWIPDIR)/netif/ppp/sha1.c \
+  $(LWIPDIR)/netif/ppp/pppcrypt.c \
+  $(LWIPDIR)/netif/ppp/multilink.c \
+  $(LWIPDIR)/netif/ppp/tdb.c \
+  $(LWIPDIR)/netif/ppp/spinlock.c \
+  $(LWIPDIR)/netif/ppp/sys-linux.c \
+  $(LWIPDIR)/netif/ppp/ppp_oe.c \
+  $(LWIPDIR)/netif/ppp/pppmy.c \
+  $(LWIPDIR)/netif/ppp/ppp.c
+
+#  $(LWIPDIR)/netif/ppp/vj.c \
 
 # SNMPFILES: Extra SNMPv1 agent
 SNMPFILES=$(LWIPDIR)/core/snmp/asn1_dec.c $(LWIPDIR)/core/snmp/asn1_enc.c \
@@ -77,7 +114,7 @@ NETIFFILES=$(LWIPDIR)/netif/etharp.c mintapif.c
 ARCHFILES=$(LWIPARCH)/sys_arch.c
 
 # LWIPFILES: All the above.
-LWIPFILES=$(COREFILES) $(CORE4FILES) $(CORE6FILES) $(SNMPFILES) $(NETIFFILES) $(ARCHFILES)
+LWIPFILES=$(COREFILES) $(CORE4FILES) $(CORE6FILES) ${PPPFILES} $(SNMPFILES) $(NETIFFILES) $(ARCHFILES)
 LWIPFILESW=$(wildcard $(LWIPFILES))
 LWIPOBJS=$(notdir $(LWIPFILESW:.c=.o))
 

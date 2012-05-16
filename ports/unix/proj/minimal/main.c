@@ -57,6 +57,9 @@
 #include "echo.h"
 #include "private_mib.h"
 
+#include "lwip/tcpip.h"
+#include "pppmy.h"
+
 /* (manual) host IP configuration */
 static ip_addr_t ipaddr, netmask, gw;
 
@@ -104,6 +107,76 @@ void usage(void)
   }
 }
 
+/* Callback executed when the TCP/IP init is done. */
+static void tcpip_init_done(void *arg)
+{
+  sys_sem_t sem = (sys_sem_t)arg;
+
+  sys_sem_signal(&sem); /* Signal the waiting thread that the TCP/IP init is done. */
+}
+
+void pppLinkStatusCallback(void *ctx, int errCode, void *arg) {
+	LWIP_UNUSED_ARG(ctx);
+
+	switch(errCode) {
+		case PPPERR_NONE: {             /* No error. */
+			struct ppp_addrs *ppp_addrs = arg;
+			printf("pppLinkStatusCallback: PPPERR_NONE\n\r");
+			printf("   our_ipaddr = %s\n\r", ip_ntoa(&ppp_addrs->our_ipaddr));
+			printf("   his_ipaddr = %s\n\r", ip_ntoa(&ppp_addrs->his_ipaddr));
+			printf("   netmask    = %s\n\r", ip_ntoa(&ppp_addrs->netmask));
+			printf("   dns1       = %s\n\r", ip_ntoa(&ppp_addrs->dns1));
+			printf("   dns2       = %s\n\r", ip_ntoa(&ppp_addrs->dns2));
+			break;
+		}
+		case PPPERR_PARAM: {           /* Invalid parameter. */
+			printf("pppLinkStatusCallback: PPPERR_PARAM\n\r");
+			break;
+		}
+		case PPPERR_OPEN: {            /* Unable to open PPP session. */
+			printf("pppLinkStatusCallback: PPPERR_OPEN\n\r");
+			break;
+		}
+		case PPPERR_DEVICE: {          /* Invalid I/O device for PPP. */
+			printf("pppLinkStatusCallback: PPPERR_DEVICE\n\r");
+			break;
+		}
+		case PPPERR_ALLOC: {           /* Unable to allocate resources. */
+			printf("pppLinkStatusCallback: PPPERR_ALLOC\n\r");
+			break;
+		}
+		case PPPERR_USER: {            /* User interrupt. */
+			printf("pppLinkStatusCallback: PPPERR_USER\n\r");
+			break;
+		}
+		case PPPERR_CONNECT: {         /* Connection lost. */
+			printf("pppLinkStatusCallback: PPPERR_CONNECT\n\r");
+			break;
+		}
+		case PPPERR_AUTHFAIL: {        /* Failed authentication challenge. */
+			printf("pppLinkStatusCallback: PPPERR_AUTHFAIL\n\r");
+			break;
+		}
+		case PPPERR_PROTOCOL: {        /* Failed to meet protocol. */
+			printf("pppLinkStatusCallback: PPPERR_PROTOCOL\n\r");
+/*			ppp_desc = pppOverEthernetOpen(&MACB_if, NULL, NULL, pppLinkStatusCallback, NULL);
+			printf("ppp_desc = %d\n\r", ppp_desc); */
+			break;
+		}
+		default: {
+			printf("pppLinkStatusCallback: unknown errCode %d\n\r", errCode);
+			break;
+		}
+	}
+
+/*	if(errCode != PPPERR_NONE) {
+		if(ppp_desc >= 0) {
+			//pppOverEthernetClose(ppp_desc);
+			ppp_desc = -1;
+		}
+	} */
+}
+
 int
 main(int argc, char **argv)
 {
@@ -111,6 +184,9 @@ main(int argc, char **argv)
   sigset_t mask, oldmask, empty;
   int ch;
   char ip_str[16] = {0}, nm_str[16] = {0}, gw_str[16] = {0};
+  sys_sem_t sem;
+  char *username = "essai", *password = "aon0viipheehooX";
+  int ppp_desc;
 
   /* startup defaults (may be overridden by one or more opts) */
   IP4_ADDR(&gw, 192,168,0,1);
@@ -166,7 +242,12 @@ main(int argc, char **argv)
   perf_init("/tmp/minimal.perf");
 #endif /* PERF */
 
-  lwip_init();
+  sys_sem_new(&sem, 0); /* Create a new semaphore. */
+  tcpip_init(tcpip_init_done, sem);
+  sys_sem_wait(&sem);    /* Block until the lwIP stack is initialized. */
+  sys_sem_free(&sem);    /* Free the semaphore. */
+
+/*  lwip_init(); */
 
   printf("TCP/IP initialized.\n");
 
@@ -176,7 +257,6 @@ main(int argc, char **argv)
 #if LWIP_IPV6
   netif_create_ip6_linklocal_address(&netif, 1);
 #endif 
-
 
 #if SNMP_PRIVATE_MIB != 0
   /* initialize our private example MIB */
@@ -197,10 +277,21 @@ main(int argc, char **argv)
 #if IP_REASSEMBLY
   timer_set_interval(TIMER_EVT_IPREASSTMR, IP_TMR_INTERVAL / 10);
 #endif
-  
+
+	ppp_init();
+
+	ppp_desc = pppOverEthernetOpen(&netif, NULL, NULL, pppLinkStatusCallback, NULL);
+	printf("ppp_desc = %d\n\r", ppp_desc);
+
+	pppSetAuth(PPPAUTHTYPE_PAP, username, password);
+
   printf("Applications started.\n");
     
+  while (1) {
+	mintapif_wait(&netif, 9999999);
+  }
 
+#if (NO_SYS == 1)
   while (1) {
     
       /* poll for input packet and ensure
@@ -225,7 +316,8 @@ main(int argc, char **argv)
         /* ... end critical section */
           sigprocmask(SIG_SETMASK, &oldmask, NULL);
       }
-    
+
+#if (NO_SYS == 1)
       if(timer_testclr_evt(TIMER_EVT_TCPTMR))
       {
         tcp_tmr();
@@ -240,8 +332,9 @@ main(int argc, char **argv)
       {
         etharp_tmr();
       }
-      
+#endif
   }
-  
+#endif
+
   return 0;
 }
