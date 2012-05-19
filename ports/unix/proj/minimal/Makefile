@@ -75,7 +75,6 @@ PPPFILES= $(LWIPDIR)/netif/ppp/magic.c \
   $(LWIPDIR)/netif/ppp/ipcp.c \
   $(LWIPDIR)/netif/ppp/upap.c \
   $(LWIPDIR)/netif/ppp/chap-new.c \
-  $(LWIPDIR)/netif/ppp/md5.c \
   $(LWIPDIR)/netif/ppp/ccp.c \
   $(LWIPDIR)/netif/ppp/ecp.c \
   $(LWIPDIR)/netif/ppp/auth.c \
@@ -86,15 +85,16 @@ PPPFILES= $(LWIPDIR)/netif/ppp/magic.c \
   $(LWIPDIR)/netif/ppp/eap.c \
   $(LWIPDIR)/netif/ppp/chap-md5.c \
   $(LWIPDIR)/netif/ppp/session.c \
-  $(LWIPDIR)/netif/ppp/md4.c \
   $(LWIPDIR)/netif/ppp/chap_ms.c \
-  $(LWIPDIR)/netif/ppp/sha1.c \
   $(LWIPDIR)/netif/ppp/pppcrypt.c \
   $(LWIPDIR)/netif/ppp/multilink.c \
   $(LWIPDIR)/netif/ppp/sys-linux.c \
   $(LWIPDIR)/netif/ppp/ppp_oe.c \
   $(LWIPDIR)/netif/ppp/pppmy.c \
-  $(LWIPDIR)/netif/ppp/ppp.c
+  $(LWIPDIR)/netif/ppp/ppp.c \
+  $(LWIPDIR)/netif/ppp/polarssl/md4.c \
+  $(LWIPDIR)/netif/ppp/polarssl/md5.c \
+  $(LWIPDIR)/netif/ppp/polarssl/sha1.c
 
 #  $(LWIPDIR)/netif/ppp/vj.c \
 

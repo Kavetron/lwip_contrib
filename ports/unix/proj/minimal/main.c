@@ -283,7 +283,7 @@ main(int argc, char **argv)
 	ppp_desc = pppOverEthernetOpen(&netif, NULL, NULL, pppLinkStatusCallback, NULL);
 	printf("ppp_desc = %d\n\r", ppp_desc);
 
-	pppSetAuth(PPPAUTHTYPE_PAP, username, password);
+	pppSetAuth(PPPAUTHTYPE_ANY, username, password);
 
   printf("Applications started.\n");
     
