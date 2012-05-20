@@ -458,10 +458,6 @@
  */
 #define MD5_SUPPORT                     1
 
-
-#define LWIP_INCLUDED_POLARSSL_MD4_C 1
-#define LWIP_INCLUDED_POLARSSL_MD5_C 1
-#define LWIP_INCLUDED_POLARSSL_SHA1_C 1
-
+#define EAP_SUPPORT 1
 
 #endif /* __LWIPOPTS_H__ */
