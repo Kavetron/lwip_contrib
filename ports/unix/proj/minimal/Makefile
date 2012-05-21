@@ -94,7 +94,8 @@ PPPFILES= $(LWIPDIR)/netif/ppp/magic.c \
   $(LWIPDIR)/netif/ppp/ppp.c \
   $(LWIPDIR)/netif/ppp/polarssl/md4.c \
   $(LWIPDIR)/netif/ppp/polarssl/md5.c \
-  $(LWIPDIR)/netif/ppp/polarssl/sha1.c
+  $(LWIPDIR)/netif/ppp/polarssl/sha1.c \
+  $(LWIPDIR)/netif/ppp/polarssl/des.c
 
 #  $(LWIPDIR)/netif/ppp/vj.c \
 
