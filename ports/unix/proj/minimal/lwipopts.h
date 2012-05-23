@@ -431,12 +431,17 @@
 /**
  * CHAP_SUPPORT==1: Support CHAP.
  */
-#define CHAP_SUPPORT                    0
+#define CHAP_SUPPORT                    1
 
 /**
- * MSCHAP_SUPPORT==1: Support MSCHAP. CURRENTLY NOT SUPPORTED! DO NOT SET!
+ * MSCHAP_SUPPORT==1: Support MSCHAP.
  */
-#define MSCHAP_SUPPORT                  0
+#define MSCHAP_SUPPORT                  1
+
+/**
+ * EAP_SUPPORT==1: Support EAP.
+ */
+#define EAP_SUPPORT			1
 
 /**
  * CBCP_SUPPORT==1: Support CBCP. CURRENTLY NOT SUPPORTED! DO NOT SET!
@@ -458,7 +463,6 @@
  */
 #define MD5_SUPPORT                     1
 
-#define EAP_SUPPORT			0
 
 
 #define LWIP_INCLUDED_POLARSSL_MD4_C 1
