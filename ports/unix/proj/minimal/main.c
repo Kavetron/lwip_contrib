@@ -58,7 +58,7 @@
 #include "private_mib.h"
 
 #include "lwip/tcpip.h"
-#include "pppmy.h"
+#include "ppp.h"
 
 /* (manual) host IP configuration */
 static ip_addr_t ipaddr, netmask, gw;
@@ -181,7 +181,9 @@ int
 main(int argc, char **argv)
 {
   struct netif netif;
+#if (NO_SYS == 1)
   sigset_t mask, oldmask, empty;
+#endif
   int ch;
   char ip_str[16] = {0}, nm_str[16] = {0}, gw_str[16] = {0};
   sys_sem_t sem;
@@ -288,7 +290,7 @@ main(int argc, char **argv)
   printf("Applications started.\n");
     
   while (1) {
-	mintapif_wait(&netif, 9999999);
+	mintapif_wait(&netif, 0xFFFF);
   }
 
 #if (NO_SYS == 1)

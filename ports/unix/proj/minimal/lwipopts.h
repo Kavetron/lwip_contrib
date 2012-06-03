@@ -426,7 +426,7 @@
 /**
  * PAP_SUPPORT==1: Support PAP.
  */
-#define PAP_SUPPORT                     0
+#define PAP_SUPPORT                     1
 
 /**
  * CHAP_SUPPORT==1: Support CHAP.
@@ -454,21 +454,18 @@
 #define CCP_SUPPORT                     0
 
 /**
+ * ECP_SUPPORT==1: Support ECP. CURRENTLY NOT SUPPORTED! DO NOT SET!
+ */
+#define ECP_SUPPORT			0
+
+/**
  * VJ_SUPPORT==1: Support VJ header compression.
  */
 #define VJ_SUPPORT                      0
 
 /**
- * MD5_SUPPORT==1: Support MD5 (see also CHAP).
+ * PPP_MD5_RANDM==1: Use MD5 for better randomness.
  */
-#define MD5_SUPPORT                     1
-
-
-
-#define LWIP_INCLUDED_POLARSSL_MD4_C 1
-#define LWIP_INCLUDED_POLARSSL_MD5_C 1
-#define LWIP_INCLUDED_POLARSSL_SHA1_C 1
-#define LWIP_INCLUDED_POLARSSL_DES_C 1
-
+#define PPP_MD5_RANDM			1
 
 #endif /* __LWIPOPTS_H__ */
