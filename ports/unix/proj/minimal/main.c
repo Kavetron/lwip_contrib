@@ -159,7 +159,7 @@ void pppLinkStatusCallback(void *ctx, int errCode, void *arg) {
 		}
 		case PPPERR_PROTOCOL: {        /* Failed to meet protocol. */
 			printf("pppLinkStatusCallback: PPPERR_PROTOCOL\n\r");
-/*			ppp_desc = pppOverEthernetOpen(&MACB_if, NULL, NULL, pppLinkStatusCallback, NULL);
+/*			ppp_desc = ppp_over_ethernet_open(&MACB_if, NULL, NULL, pppLinkStatusCallback, NULL);
 			printf("ppp_desc = %d\n\r", ppp_desc); */
 			break;
 		}
@@ -282,10 +282,10 @@ main(int argc, char **argv)
 
 	ppp_init();
 
-	ppp_desc = pppOverEthernetOpen(&netif, NULL, NULL, pppLinkStatusCallback, NULL);
+	ppp_desc = ppp_over_ethernet_open(&netif, NULL, NULL, pppLinkStatusCallback, NULL);
 	printf("ppp_desc = %d\n\r", ppp_desc);
 
-	pppSetAuth(PPPAUTHTYPE_ANY, username, password);
+	ppp_set_auth(PPPAUTHTYPE_ANY, username, password);
 
   printf("Applications started.\n");
     

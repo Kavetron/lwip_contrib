@@ -81,15 +81,14 @@ PPPFILES= $(LWIPDIR)/netif/ppp/magic.c \
   $(LWIPDIR)/netif/ppp/options.c \
   $(LWIPDIR)/netif/ppp/demand.c \
   $(LWIPDIR)/netif/ppp/utils.c \
-  $(LWIPDIR)/netif/ppp/tty.c \
   $(LWIPDIR)/netif/ppp/eap.c \
   $(LWIPDIR)/netif/ppp/chap-md5.c \
-  $(LWIPDIR)/netif/ppp/session.c \
   $(LWIPDIR)/netif/ppp/chap_ms.c \
   $(LWIPDIR)/netif/ppp/pppcrypt.c \
   $(LWIPDIR)/netif/ppp/multilink.c \
   $(LWIPDIR)/netif/ppp/ppp_oe.c \
   $(LWIPDIR)/netif/ppp/ppp.c \
+  $(LWIPDIR)/netif/ppp/vj.c \
   $(LWIPDIR)/netif/ppp/polarssl/md4.c \
   $(LWIPDIR)/netif/ppp/polarssl/md5.c \
   $(LWIPDIR)/netif/ppp/polarssl/sha1.c \

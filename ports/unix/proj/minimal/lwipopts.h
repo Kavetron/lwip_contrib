@@ -461,11 +461,11 @@
 /**
  * VJ_SUPPORT==1: Support VJ header compression.
  */
-#define VJ_SUPPORT                      0
+#define VJ_SUPPORT                      1
 
 /**
  * PPP_MD5_RANDM==1: Use MD5 for better randomness.
  */
-#define PPP_MD5_RANDM			1
+#define PPP_MD5_RANDM			0
 
 #endif /* __LWIPOPTS_H__ */
