@@ -49,6 +49,7 @@
 #include <linux/if_tun.h>
 #define DEVTAP "/dev/net/tun"
 #define IFCONFIG_ARGS "tap0 inet %d.%d.%d.%d"
+#define IFCONFIG2_ARGS "tap1 inet %d.%d.%d.%d"
 
 #elif defined(openbsd)
 #define DEVTAP "/dev/tun0"
@@ -70,16 +71,8 @@
 #define IFNAME0 'e'
 #define IFNAME1 't'
 
-struct mintapif {
-  struct eth_addr *ethaddr;
-  /* Add whatever per-interface state that is needed here. */
-  u32_t lasttime;
-  int fd;
-};
-
 /* Forward declarations. */
-static void  mintapif_input(struct netif *netif);
-
+ 
 /*-----------------------------------------------------------------------------------*/
 static void
 low_level_init(struct netif *netif)
@@ -95,7 +88,7 @@ low_level_init(struct netif *netif)
   mintapif->ethaddr->addr[2] = 0xf1;
   mintapif->ethaddr->addr[3] = 0x3c;
   mintapif->ethaddr->addr[4] = 0x34;
-  mintapif->ethaddr->addr[5] = 0xc3;
+  mintapif->ethaddr->addr[5] = 0x00 + netif->num;
 
   /* device capabilities */
   /* don't set NETIF_FLAG_ETHARP if this device is not an ethernet one */
@@ -121,11 +114,20 @@ low_level_init(struct netif *netif)
   }
 #endif /* Linux */
 
-  snprintf(buf, sizeof(buf), "/sbin/ifconfig " IFCONFIG_ARGS,
-           ip4_addr1(&(netif->gw)),
-           ip4_addr2(&(netif->gw)),
-           ip4_addr3(&(netif->gw)),
-           ip4_addr4(&(netif->gw)));
+  if(netif->num == 0) {
+    snprintf(buf, sizeof(buf), "/sbin/ifconfig " IFCONFIG_ARGS,
+             ip4_addr1(&(netif->gw)),
+             ip4_addr2(&(netif->gw)),
+             ip4_addr3(&(netif->gw)),
+             ip4_addr4(&(netif->gw)));
+  } else {
+    snprintf(buf, sizeof(buf), "/sbin/ifconfig " IFCONFIG2_ARGS,
+             ip4_addr1(&(netif->gw)),
+             ip4_addr2(&(netif->gw)),
+             ip4_addr3(&(netif->gw)),
+             ip4_addr4(&(netif->gw)));
+  }
+
   
   system(buf);
 
@@ -243,7 +245,7 @@ low_level_input(struct netif *netif)
  *
  */
 /*-----------------------------------------------------------------------------------*/
-static void
+void
 mintapif_input(struct netif *netif)
 {
   struct pbuf *p;
@@ -301,7 +303,7 @@ mintapif_init(struct netif *netif)
   netif->name[1] = IFNAME1;
   netif->output = etharp_output;
   netif->linkoutput = low_level_output;
-  netif->mtu = 1500;
+  netif->mtu = 900;
   
   mintapif->ethaddr = (struct eth_addr *)&(netif->hwaddr[0]);
   

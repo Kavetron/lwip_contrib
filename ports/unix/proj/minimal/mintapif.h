@@ -34,6 +34,13 @@
 
 #include "lwip/netif.h"
 
+struct mintapif {
+  struct eth_addr *ethaddr;
+  /* Add whatever per-interface state that is needed here. */
+  u32_t lasttime;
+  int fd;
+};
+
 enum mintapif_signal {
   MINTAPIF_TIMEOUT,
   MINTAPIF_PACKET
@@ -42,5 +49,7 @@ enum mintapif_signal {
 err_t mintapif_init(struct netif *netif);
 int mintapif_select(struct netif *netif);
 enum mintapif_signal mintapif_wait(struct netif *netif, u16_t time);
+
+void  mintapif_input(struct netif *netif);
 
 #endif /* __MINTAPIF_H__ */

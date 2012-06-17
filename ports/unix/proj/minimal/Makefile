@@ -38,7 +38,8 @@ CC=gcc
 ARCH=linux
 #CFLAGS=-g -Wall -pedantic -D$(ARCH) -DIPv4 -Os -fpack-struct -DLWIP_DEBUG -lpthread 
 #CFLAGS=-g -Wall -D$(ARCH) -DIPv4 -Os -fpack-struct -DLWIP_DEBUG -lpthread -ldl -lcrypt -DHAVE_PATHS_H -DIPX_CHANGE -DHAVE_MMAP -DCHAPMS=1 -DMPPE=1 -DHAS_SHADOW -DHAVE_CRYPT_H=1 -DUSE_CRYPT=1 -DHAVE_MULTILINK -DUSE_TDB=1 -DPLUGIN -DMAXOCTETS -DDESTDIR="/usr/local"
-CFLAGS=-ggdb -Wall -pedantic -D$(ARCH) -DIPv4 -Os -DLWIP_DEBUG -DDEBUGALL -lpthread
+#CFLAGS=-ggdb -Wall -pedantic -D$(ARCH) -DIPv4 -Os -DLWIP_DEBUG -DDEBUGALL -lpthread
+CFLAGS=-ggdb -Wall -pedantic -D$(ARCH) -DIPv4 -DLWIP_DEBUG -DDEBUGALL -lpthread
 ARFLAGS=rs
 
 CONTRIBDIR=../../../..
@@ -78,7 +79,6 @@ PPPFILES= $(LWIPDIR)/netif/ppp/magic.c \
   $(LWIPDIR)/netif/ppp/ccp.c \
   $(LWIPDIR)/netif/ppp/ecp.c \
   $(LWIPDIR)/netif/ppp/auth.c \
-  $(LWIPDIR)/netif/ppp/options.c \
   $(LWIPDIR)/netif/ppp/demand.c \
   $(LWIPDIR)/netif/ppp/utils.c \
   $(LWIPDIR)/netif/ppp/eap.c \
@@ -89,10 +89,10 @@ PPPFILES= $(LWIPDIR)/netif/ppp/magic.c \
   $(LWIPDIR)/netif/ppp/ppp_oe.c \
   $(LWIPDIR)/netif/ppp/ppp.c \
   $(LWIPDIR)/netif/ppp/vj.c \
-  $(LWIPDIR)/netif/ppp/polarssl/md4.c \
-  $(LWIPDIR)/netif/ppp/polarssl/md5.c \
-  $(LWIPDIR)/netif/ppp/polarssl/sha1.c \
-  $(LWIPDIR)/netif/ppp/polarssl/des.c
+  $(LWIPDIR)/netif/ppp/polarssl/lwip_md4.c \
+  $(LWIPDIR)/netif/ppp/polarssl/lwip_md5.c \
+  $(LWIPDIR)/netif/ppp/polarssl/lwip_sha1.c \
+  $(LWIPDIR)/netif/ppp/polarssl/lwip_des.c
 
 #  $(LWIPDIR)/netif/ppp/vj.c \
 

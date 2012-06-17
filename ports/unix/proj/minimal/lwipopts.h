@@ -393,7 +393,7 @@
 /* Misc */
 
 
-#define PPP_DEBUG LWIP_DBG_ON
+#define PPP_DEBUG LWIP_DBG_OFF
 
 
 
@@ -421,7 +421,7 @@
 /**
  * NUM_PPP: Max PPP sessions.
  */
-#define NUM_PPP                         1
+#define NUM_PPP                         10
 
 /**
  * PAP_SUPPORT==1: Support PAP.
@@ -468,4 +468,13 @@
  */
 #define PPP_MD5_RANDM			0
 
+#define LCP_ECHOINTERVAL		1
+#define LCP_MAXECHOFAILS		4
+
+#define PRINTPKT_SUPPORT		1
+
+#define PPP_SERVER 0 
+
+
+#define MEMP_NUM_PPPOE_INTERFACES 10
 #endif /* __LWIPOPTS_H__ */

@@ -115,13 +115,13 @@ static void tcpip_init_done(void *arg)
   sys_sem_signal(&sem); /* Signal the waiting thread that the TCP/IP init is done. */
 }
 
-void pppLinkStatusCallback(void *ctx, int errCode, void *arg) {
+void ppp_link_status_cb(void *ctx, int errCode, void *arg) {
 	LWIP_UNUSED_ARG(ctx);
 
 	switch(errCode) {
 		case PPPERR_NONE: {             /* No error. */
 			struct ppp_addrs *ppp_addrs = arg;
-			printf("pppLinkStatusCallback: PPPERR_NONE\n\r");
+			printf("ppp_link_status_cb: PPPERR_NONE\n\r");
 			printf("   our_ipaddr = %s\n\r", ip_ntoa(&ppp_addrs->our_ipaddr));
 			printf("   his_ipaddr = %s\n\r", ip_ntoa(&ppp_addrs->his_ipaddr));
 			printf("   netmask    = %s\n\r", ip_ntoa(&ppp_addrs->netmask));
@@ -130,41 +130,41 @@ void pppLinkStatusCallback(void *ctx, int errCode, void *arg) {
 			break;
 		}
 		case PPPERR_PARAM: {           /* Invalid parameter. */
-			printf("pppLinkStatusCallback: PPPERR_PARAM\n\r");
+			printf("ppp_link_status_cb: PPPERR_PARAM\n\r");
 			break;
 		}
 		case PPPERR_OPEN: {            /* Unable to open PPP session. */
-			printf("pppLinkStatusCallback: PPPERR_OPEN\n\r");
+			printf("ppp_link_status_cb: PPPERR_OPEN\n\r");
 			break;
 		}
 		case PPPERR_DEVICE: {          /* Invalid I/O device for PPP. */
-			printf("pppLinkStatusCallback: PPPERR_DEVICE\n\r");
+			printf("ppp_link_status_cb: PPPERR_DEVICE\n\r");
 			break;
 		}
 		case PPPERR_ALLOC: {           /* Unable to allocate resources. */
-			printf("pppLinkStatusCallback: PPPERR_ALLOC\n\r");
+			printf("ppp_link_status_cb: PPPERR_ALLOC\n\r");
 			break;
 		}
 		case PPPERR_USER: {            /* User interrupt. */
-			printf("pppLinkStatusCallback: PPPERR_USER\n\r");
+			printf("ppp_link_status_cb: PPPERR_USER\n\r");
 			break;
 		}
 		case PPPERR_CONNECT: {         /* Connection lost. */
-			printf("pppLinkStatusCallback: PPPERR_CONNECT\n\r");
+			printf("ppp_link_status_cb: PPPERR_CONNECT\n\r");
 			break;
 		}
 		case PPPERR_AUTHFAIL: {        /* Failed authentication challenge. */
-			printf("pppLinkStatusCallback: PPPERR_AUTHFAIL\n\r");
+			printf("ppp_link_status_cb: PPPERR_AUTHFAIL\n\r");
 			break;
 		}
 		case PPPERR_PROTOCOL: {        /* Failed to meet protocol. */
-			printf("pppLinkStatusCallback: PPPERR_PROTOCOL\n\r");
-/*			ppp_desc = ppp_over_ethernet_open(&MACB_if, NULL, NULL, pppLinkStatusCallback, NULL);
+			printf("ppp_link_status_cb: PPPERR_PROTOCOL\n\r");
+/*			ppp_desc = ppp_over_ethernet_open(&MACB_if, NULL, NULL, ppp_link_status_cb, NULL);
 			printf("ppp_desc = %d\n\r", ppp_desc); */
 			break;
 		}
 		default: {
-			printf("pppLinkStatusCallback: unknown errCode %d\n\r", errCode);
+			printf("ppp_link_status_cb: unknown errCode %d\n\r", errCode);
 			break;
 		}
 	}
@@ -181,6 +181,7 @@ int
 main(int argc, char **argv)
 {
   struct netif netif;
+  struct netif netif2;
 #if (NO_SYS == 1)
   sigset_t mask, oldmask, empty;
 #endif
@@ -188,7 +189,9 @@ main(int argc, char **argv)
   char ip_str[16] = {0}, nm_str[16] = {0}, gw_str[16] = {0};
   sys_sem_t sem;
   char *username = "essai", *password = "aon0viipheehooX";
-  int ppp_desc;
+  char *username2 = "essai2", *password2 = "aon0viipheehooX";
+  ppp_pcb *ppp, *ppp2;
+  int coin = 0;
 
   /* startup defaults (may be overridden by one or more opts) */
   IP4_ADDR(&gw, 192,168,0,1);
@@ -254,11 +257,22 @@ main(int argc, char **argv)
   printf("TCP/IP initialized.\n");
 
   netif_add(&netif, &ipaddr, &netmask, &gw, NULL, mintapif_init, ethernet_input);
-  netif_set_default(&netif);
+/*  netif_set_default(&netif); */
   netif_set_up(&netif);
+
+  IP4_ADDR(&gw, 192,168,1,1);
+  IP4_ADDR(&ipaddr, 192,168,1,2);
+  IP4_ADDR(&netmask, 255,255,255,0);
+
+  netif_add(&netif2, &ipaddr, &netmask, &gw, NULL, mintapif_init, ethernet_input);
+  netif_set_up(&netif2);
+
 #if LWIP_IPV6
   netif_create_ip6_linklocal_address(&netif, 1);
 #endif 
+
+  printf("netif %d\n", netif.num);
+  printf("netif2 %d\n", netif2.num);
 
 #if SNMP_PRIVATE_MIB != 0
   /* initialize our private example MIB */
@@ -282,15 +296,50 @@ main(int argc, char **argv)
 
 	ppp_init();
 
-	ppp_desc = ppp_over_ethernet_open(&netif, NULL, NULL, pppLinkStatusCallback, NULL);
-	printf("ppp_desc = %d\n\r", ppp_desc);
+	ppp = ppp_new(10);
+	ppp2 = ppp_new(20);
 
-	ppp_set_auth(PPPAUTHTYPE_ANY, username, password);
+	printf("ppp = %d, sizeof(ppp) = %ld\n\r", ppp->num, sizeof(ppp_pcb));
+	printf("ppp2 = %d, sizeof(ppp) = %ld\n\r", ppp2->num, sizeof(ppp_pcb));
+
+	ppp_set_auth(ppp, PPPAUTHTYPE_ANY, username, password);
+	ppp_over_ethernet_open(ppp, &netif, NULL, NULL, ppp_link_status_cb, NULL);
+
+	ppp_set_auth(ppp2, PPPAUTHTYPE_ANY, username2, password2);
+	ppp_over_ethernet_open(ppp2, &netif2, NULL, NULL, ppp_link_status_cb, NULL);
 
   printf("Applications started.\n");
     
   while (1) {
-	mintapif_wait(&netif, 0xFFFF);
+    fd_set fdset;
+    struct timeval tv;
+    struct mintapif *mintapif, *mintapif2;
+    int ret;
+
+    tv.tv_sec = 1;
+    tv.tv_usec = 0; /* usec_to; */
+
+    FD_ZERO(&fdset);
+
+    mintapif = netif.state;
+    FD_SET(mintapif->fd, &fdset);
+
+    mintapif2 = netif2.state;
+    FD_SET(mintapif2->fd, &fdset);
+
+    ret = select( LWIP_MAX(mintapif->fd, mintapif2->fd) + 1, &fdset, NULL, NULL, &tv);
+    if(ret > 0) {
+      if( FD_ISSET(mintapif->fd, &fdset) )
+        mintapif_input(&netif);
+      if( FD_ISSET(mintapif2->fd, &fdset) )
+        mintapif_input(&netif2);
+    }
+
+	coin++;
+	/* printf("COIN %d\n", coin); */
+	if(coin == 200) {
+		/* ppp_close(ppp); */
+	}
   }
 
 #if (NO_SYS == 1)
