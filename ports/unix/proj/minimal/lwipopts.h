@@ -393,8 +393,13 @@
 /* Misc */
 
 
-#define PPP_DEBUG LWIP_DBG_OFF
+/* ---------- IPv6 options ---------- */
+#define LWIP_IPV6      1
+#define LWIP_IPV6_FRAG  1
 
+
+#define PPP_DEBUG LWIP_DBG_ON
+#define IP6_DEBUG LWIP_DBG_OFF
 
 
 /*
@@ -473,8 +478,10 @@
 
 #define PRINTPKT_SUPPORT		1
 
+#define PPP_IPV6_SUPPORT 1
+
 #define PPP_SERVER 0 
 
-
+#define MEMP_NUM_PPP_PCB 10
 #define MEMP_NUM_PPPOE_INTERFACES 10
 #endif /* __LWIPOPTS_H__ */

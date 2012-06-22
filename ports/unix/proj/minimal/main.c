@@ -122,11 +122,15 @@ void ppp_link_status_cb(void *ctx, int errCode, void *arg) {
 		case PPPERR_NONE: {             /* No error. */
 			struct ppp_addrs *ppp_addrs = arg;
 			printf("ppp_link_status_cb: PPPERR_NONE\n\r");
-			printf("   our_ipaddr = %s\n\r", ip_ntoa(&ppp_addrs->our_ipaddr));
-			printf("   his_ipaddr = %s\n\r", ip_ntoa(&ppp_addrs->his_ipaddr));
-			printf("   netmask    = %s\n\r", ip_ntoa(&ppp_addrs->netmask));
-			printf("   dns1       = %s\n\r", ip_ntoa(&ppp_addrs->dns1));
-			printf("   dns2       = %s\n\r", ip_ntoa(&ppp_addrs->dns2));
+			printf("   our_ipaddr  = %s\n\r", ip_ntoa(&ppp_addrs->our_ipaddr));
+			printf("   his_ipaddr  = %s\n\r", ip_ntoa(&ppp_addrs->his_ipaddr));
+			printf("   netmask     = %s\n\r", ip_ntoa(&ppp_addrs->netmask));
+			printf("   dns1        = %s\n\r", ip_ntoa(&ppp_addrs->dns1));
+			printf("   dns2        = %s\n\r", ip_ntoa(&ppp_addrs->dns2));
+#if PPP_IPV6_SUPPORT
+			printf("   our6_ipaddr = %s\n\r", ip6addr_ntoa(&ppp_addrs->our6_ipaddr));
+			printf("   his6_ipaddr = %s\n\r", ip6addr_ntoa(&ppp_addrs->his6_ipaddr));
+#endif /* PPP_IPV6_SUPPORT */
 			break;
 		}
 		case PPPERR_PARAM: {           /* Invalid parameter. */
@@ -268,7 +272,7 @@ main(int argc, char **argv)
   netif_set_up(&netif2);
 
 #if LWIP_IPV6
-  netif_create_ip6_linklocal_address(&netif, 1);
+  /* netif_create_ip6_linklocal_address(&netif, 1); */
 #endif 
 
   printf("netif %d\n", netif.num);
@@ -296,16 +300,19 @@ main(int argc, char **argv)
 
 	ppp_init();
 
-	ppp = ppp_new(10);
-	ppp2 = ppp_new(20);
+	ppp = ppp_new();
+	ppp2 = ppp_new();
 
-	printf("ppp = %d, sizeof(ppp) = %ld\n\r", ppp->num, sizeof(ppp_pcb));
-	printf("ppp2 = %d, sizeof(ppp) = %ld\n\r", ppp2->num, sizeof(ppp_pcb));
+#if PPP_DEBUG
+	printf("ppp = %d\n", ppp->num);
+	printf("ppp2 = %d\n", ppp2->num);
+#endif
+	printf("ppp_pcb sizeof(ppp) = %ld\n", sizeof(ppp_pcb));
 
-	ppp_set_auth(ppp, PPPAUTHTYPE_ANY, username, password);
+	ppp_set_auth(ppp, PPPAUTHTYPE_CHAP, username, password);
 	ppp_over_ethernet_open(ppp, &netif, NULL, NULL, ppp_link_status_cb, NULL);
 
-	ppp_set_auth(ppp2, PPPAUTHTYPE_ANY, username2, password2);
+	ppp_set_auth(ppp2, PPPAUTHTYPE_PAP, username2, password2);
 	ppp_over_ethernet_open(ppp2, &netif2, NULL, NULL, ppp_link_status_cb, NULL);
 
   printf("Applications started.\n");
@@ -336,9 +343,10 @@ main(int argc, char **argv)
     }
 
 	coin++;
-	/* printf("COIN %d\n", coin); */
-	if(coin == 200) {
+        if(!(coin%1000)) printf("COIN %d\n", coin);
+	if(coin == 4000) {
 		/* ppp_close(ppp); */
+		ppp = NULL;
 	}
   }
 
