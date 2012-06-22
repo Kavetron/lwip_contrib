@@ -115,12 +115,12 @@ static void tcpip_init_done(void *arg)
   sys_sem_signal(&sem); /* Signal the waiting thread that the TCP/IP init is done. */
 }
 
-void ppp_link_status_cb(void *ctx, int errCode, void *arg) {
+void ppp_link_status_cb(ppp_pcb *pcb, int err_code, void *ctx) {
 	LWIP_UNUSED_ARG(ctx);
 
-	switch(errCode) {
+	switch(err_code) {
 		case PPPERR_NONE: {             /* No error. */
-			struct ppp_addrs *ppp_addrs = arg;
+			struct ppp_addrs *ppp_addrs = &pcb->addrs;
 			printf("ppp_link_status_cb: PPPERR_NONE\n\r");
 			printf("   our_ipaddr  = %s\n\r", ip_ntoa(&ppp_addrs->our_ipaddr));
 			printf("   his_ipaddr  = %s\n\r", ip_ntoa(&ppp_addrs->his_ipaddr));
@@ -168,7 +168,7 @@ void ppp_link_status_cb(void *ctx, int errCode, void *arg) {
 			break;
 		}
 		default: {
-			printf("ppp_link_status_cb: unknown errCode %d\n\r", errCode);
+			printf("ppp_link_status_cb: unknown err code %d\n\r", err_code);
 			break;
 		}
 	}
