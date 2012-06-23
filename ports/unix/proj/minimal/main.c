@@ -344,13 +344,14 @@ main(int argc, char **argv)
 	fprintf(stderr, "ppp_pcb sizeof(ppp) = %ld\n", sizeof(ppp_pcb));
 
 	ppp_set_auth(ppp, PPPAUTHTYPE_EAP, username, password);
-	/* ppp_over_ethernet_open(ppp, &netif, NULL, NULL, ppp_link_status_cb, NULL); */
+	ppp_over_ethernet_open(ppp, &netif, NULL, NULL, ppp_link_status_cb, NULL);
 
 	ppp_set_auth(ppp2, PPPAUTHTYPE_MSCHAP, username2, password2);
-	/* ppp_over_ethernet_open(ppp2, &netif2, NULL, NULL, ppp_link_status_cb, NULL); */
+	ppp_over_ethernet_open(ppp2, &netif2, NULL, NULL, ppp_link_status_cb, NULL);
 
 	ser = sio_open(2);
 	fprintf(stderr, "SIO FD = %d\n", ser->fd);
+	usleep(100000); /* wait a little bit for forked pppd to be ready */
 
 	ppp_set_auth(ppps, PPPAUTHTYPE_PAP, username2, password2);
 	ppp_over_serial_open(ppps, ser, ppp_link_status_cb, NULL);

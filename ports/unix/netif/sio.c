@@ -326,6 +326,9 @@ sio_status_t * sio_open( int devnum )
 			"ms-dns", "198.168.100.7",
 			"local", "crtscts",
 			"debug",
+#if PPP_IPV6_SUPPORT
+			"+ipv6",
+#endif
 #ifdef LWIP_PPP_CHAP_TEST
 			"auth",
 			"require-chap",
