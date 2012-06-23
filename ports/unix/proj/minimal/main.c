@@ -399,12 +399,12 @@ main(int argc, char **argv)
 #if 0
     FD_SET(from_pppd[0], &fdset);
 #endif
-
+#if !PPP_INPROC_MULTITHREADED
     if(ser) {
       FD_SET(ser->fd, &fdset);
       maxfd = LWIP_MAX(maxfd, ser->fd);
     }
-
+#endif /* PPP_INPROC_MULTITHREADED */
     ret = select( maxfd + 1, &fdset, NULL, NULL, &tv);
     if(ret > 0) {
       if( FD_ISSET(mintapif->fd, &fdset) )
@@ -415,12 +415,14 @@ main(int argc, char **argv)
       if( FD_ISSET(from_pppd[0], &fdset) )
         sio_input(ppps);
 #endif
+#if !PPP_INPROC_MULTITHREADED 
       if(ser && FD_ISSET(ser->fd, &fdset) ) {
         u8_t buffer[128];
         int len;
         len = sio_read(ser, buffer, 128);
         pppos_input(ppps, buffer, len);
       }
+#endif /* PPP_INPROC_MULTITHREADED */
     }
 
 	coin++;

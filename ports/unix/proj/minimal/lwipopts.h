@@ -143,14 +143,14 @@
  * for callback/timeout API communication. 
  * (only needed if you use tcpip.c)
  */
-#define MEMP_NUM_TCPIP_MSG_API          0
+/* #define MEMP_NUM_TCPIP_MSG_API          0 */
 
 /**
  * MEMP_NUM_TCPIP_MSG_INPKT: the number of struct tcpip_msg, which are used
  * for incoming packets. 
  * (only needed if you use tcpip.c)
  */
-#define MEMP_NUM_TCPIP_MSG_INPKT        0
+/* #define MEMP_NUM_TCPIP_MSG_INPKT        0 */
 
 /**
  * PBUF_POOL_SIZE: the number of buffers in the pbuf pool. 
@@ -486,5 +486,6 @@
 #define MEMP_NUM_PPP_PCB 10
 #define MEMP_NUM_PPPOE_INTERFACES 10
 
-#define PPP_INPROC_MULTITHREADED 0
+#define PPP_INPROC_MULTITHREADED 1
+#define PPP_INPROC_OWNTHREAD 1
 #endif /* __LWIPOPTS_H__ */
