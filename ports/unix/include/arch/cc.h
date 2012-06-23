@@ -36,6 +36,8 @@
 #include <string.h>
 #include <sys/time.h>
 #include <limits.h>
+#include <stdio.h>
+#include <stdarg.h>
 
 #define LWIP_TIMEVAL_PRIVATE 0
 
@@ -76,11 +78,13 @@ typedef unsigned long mem_ptr_t;
 #define PACK_STRUCT_BEGIN
 #define PACK_STRUCT_END
 
+int myprintf(const char *format, ...);
+
 /* prototypes for printf() and abort() */
 #include <stdio.h>
 #include <stdlib.h>
 /* Plaform specific diagnostic output */
-#define LWIP_PLATFORM_DIAG(x)	do {printf x;} while(0)
+#define LWIP_PLATFORM_DIAG(x)	do {myprintf x;} while(0)
 
 #define LWIP_PLATFORM_ASSERT(x) do {printf("Assertion \"%s\" failed at line %d in %s\n", \
                                      x, __LINE__, __FILE__); fflush(NULL); abort();} while(0)

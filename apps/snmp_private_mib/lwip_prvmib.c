@@ -267,7 +267,7 @@ lwip_privmib_init(void)
   int i;
 #endif /* SENSORS_USE_FILES && SENSORS_SEARCH_FILES */
 
-  printf("SNMP private MIB start, detecting sensors.\n");
+  fprintf(stderr, "SNMP private MIB start, detecting sensors.\n");
 
 #if SENSORS_USE_FILES && SENSORS_SEARCH_FILES
   /* look for sensors in sensors directory */
@@ -304,7 +304,7 @@ lwip_privmib_init(void)
               snmp_mib_node_insert(&sensor_addr_inf.sensor_list_rn,index,&dummy);
 
               strncpy(&sensor_addr_inf.sensor_files[index][0],dp->d_name,SENSOR_NAME_LEN);
-              printf("%s\n", sensor_addr_inf.sensor_files[index]);
+              fprintf(stderr, "%s\n", sensor_addr_inf.sensor_files[index]);
             }
             cp += dp->d_reclen;
           }
@@ -326,7 +326,7 @@ lwip_privmib_init(void)
     snmp_mib_node_insert(&sensor_addr_inf.sensor_list_rn, index, &dummy);
 
     strncpy(&sensor_addr_inf.sensor_files[index][0], name, SENSOR_NAME_LEN);
-    printf("%s\n", sensor_addr_inf.sensor_files[index]);
+    fprintf(stderr, "%s\n", sensor_addr_inf.sensor_files[index]);
 #if !SENSORS_USE_FILES
     /* initialize sensor value to != zero */
     sensor_values[i] = 11 * (i+1);

@@ -39,7 +39,7 @@ ARCH=linux
 #CFLAGS=-g -Wall -pedantic -D$(ARCH) -DIPv4 -Os -fpack-struct -DLWIP_DEBUG -lpthread 
 #CFLAGS=-g -Wall -D$(ARCH) -DIPv4 -Os -fpack-struct -DLWIP_DEBUG -lpthread -ldl -lcrypt -DHAVE_PATHS_H -DIPX_CHANGE -DHAVE_MMAP -DCHAPMS=1 -DMPPE=1 -DHAS_SHADOW -DHAVE_CRYPT_H=1 -DUSE_CRYPT=1 -DHAVE_MULTILINK -DUSE_TDB=1 -DPLUGIN -DMAXOCTETS -DDESTDIR="/usr/local"
 #CFLAGS=-ggdb -Wall -pedantic -D$(ARCH) -DIPv4 -Os -DLWIP_DEBUG -DDEBUGALL -lpthread
-CFLAGS=-ggdb -Wall -pedantic -D$(ARCH) -DIPv4 -DLWIP_DEBUG -DDEBUGALL -lpthread
+CFLAGS=-ggdb -Wall -pedantic -D$(ARCH) -DIPv4 -DLWIP_DEBUG -DDEBUGALL -lpthread -lutil
 ARFLAGS=rs
 
 CONTRIBDIR=../../../..
@@ -105,7 +105,7 @@ SNMPFILES=$(LWIPDIR)/core/snmp/asn1_dec.c $(LWIPDIR)/core/snmp/asn1_enc.c \
 	../../../../apps/snmp_private_mib/lwip_prvmib.c
 
 # NETIFFILES: Files implementing various generic network interface functions.'
-NETIFFILES=$(LWIPDIR)/netif/etharp.c mintapif.c
+NETIFFILES=$(LWIPDIR)/netif/etharp.c mintapif.c ../../netif/sio.c
 
 # ARCHFILES: Architecture specific files
 ARCHFILES=$(LWIPARCH)/sys_arch.c

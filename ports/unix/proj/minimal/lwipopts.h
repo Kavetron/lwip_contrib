@@ -124,7 +124,7 @@
 /**
  * MEMP_NUM_SYS_TIMEOUT: the number of simulateously active timeouts.
  */
-#define MEMP_NUM_SYS_TIMEOUT            10
+#define MEMP_NUM_SYS_TIMEOUT            15
 
 /**
  * MEMP_NUM_NETBUF: the number of struct netbufs.
@@ -398,6 +398,7 @@
 #define LWIP_IPV6_FRAG  1
 
 
+#define SIO_DEBUG LWIP_DBG_ON
 #define PPP_DEBUG LWIP_DBG_ON
 #define IP6_DEBUG LWIP_DBG_OFF
 
@@ -420,7 +421,7 @@
 /**
  * PPPOS_SUPPORT==1: Enable PPP Over Serial
  */
-#define PPPOS_SUPPORT                   0
+#define PPPOS_SUPPORT                   1
 
 
 /**
@@ -484,4 +485,6 @@
 
 #define MEMP_NUM_PPP_PCB 10
 #define MEMP_NUM_PPPOE_INTERFACES 10
+
+#define PPP_INPROC_MULTITHREADED 0
 #endif /* __LWIPOPTS_H__ */

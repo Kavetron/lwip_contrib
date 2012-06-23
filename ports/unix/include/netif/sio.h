@@ -1,8 +1,9 @@
 #ifndef SIO_H
 #define SIO_H
 
+#include "lwip/opt.h"
 #include "lwip/sys.h"
-#include "lwip/netif.h"
+/* #include "lwip/netif.h" */
 #include "netif/fifo.h"
 /*#include "netif/pppif.h"*/
 /* BAUDRATE is defined in sio.c as it is implementation specific */
@@ -27,7 +28,7 @@ typedef enum sioBaudrates {
 * @param 	siostat siostatus struct, contains sio instance data, given by sio_open
 * @return 	char read from input stream
 */
-u8_t sio_recv( sio_status_t * siostat );
+/* u8_t sio_recv( sio_status_t * siostat ); */
 
 /**
 * Poll for a new character from incoming data stream
@@ -48,7 +49,7 @@ void sio_expect_string(u8_t *str, sio_status_t * siostat);
 * @param 	c		char to write to output stream
 * @param 	siostat siostatus struct, contains sio instance data, given by sio_open
 */
-void sio_send( u8_t c, sio_status_t * siostat );
+/* void sio_send( u8_t c, sio_status_t * siostat ); */
 
 /**
 * Write a char to output data stream
@@ -69,7 +70,7 @@ void sio_flush( sio_status_t * siostat );
 * @param	devnum	the device number to use, i.e. ttySx, comx:, etc. there x = devnum
 * @return 	siostatus struct, contains sio instance data, use when calling sio functions
 */
-sio_status_t * sio_open( int devnum );
+/* sio_status_t * sio_open( int devnum ); */
 
 /**
 *	Change baudrate of port, may close and reopen port
