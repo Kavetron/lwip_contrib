@@ -51,8 +51,7 @@ LWIPDIR=$(CONTRIBDIR)/../lwip/src
 
 CFLAGS:=$(CFLAGS) \
 	-I$(LWIPDIR)/include -I$(LWIPARCH)/include -I$(LWIPDIR)/include/ipv4 \
-	-I$(LWIPDIR)/include/ipv6 -I. -I$(CONTRIBDIR)/apps/snmp_private_mib \
-	-I$(LWIPDIR)/netif/ppp/
+	-I$(LWIPDIR)/include/ipv6 -I. -I$(CONTRIBDIR)/apps/snmp_private_mib
 
 # COREFILES, CORE4FILES: The minimum set of files needed for lwIP.
 COREFILES=$(LWIPDIR)/core/def.c $(LWIPDIR)/core/dhcp.c $(LWIPDIR)/core/dns.c \
@@ -61,7 +60,7 @@ COREFILES=$(LWIPDIR)/core/def.c $(LWIPDIR)/core/dhcp.c $(LWIPDIR)/core/dns.c \
 	$(LWIPDIR)/core/raw.c $(LWIPDIR)/core/stats.c $(LWIPDIR)/core/sys.c \
 	$(LWIPDIR)/core/tcp.c $(LWIPDIR)/core/tcp_in.c $(LWIPDIR)/core/tcp_in.c \
 	$(LWIPDIR)/core/tcp_out.c $(LWIPDIR)/core/timers.c $(LWIPDIR)/core/udp.c \
-	$(LWIPDIR)/api/tcpip.c
+	$(LWIPDIR)/api/tcpip.c $(LWIPDIR)/api/pppapi.c $(LWIPDIR)/api/netifapi.c
 CORE4FILES=$(LWIPDIR)/core/ipv4/autoip.c $(LWIPDIR)/core/ipv4/icmp.c \
 	$(LWIPDIR)/core/ipv4/igmp.c $(LWIPDIR)/core/ipv4/ip_frag.c \
 	$(LWIPDIR)/core/ipv4/ip4.c $(LWIPDIR)/core/ipv4/ip4_addr.c
@@ -86,15 +85,17 @@ PPPFILES= $(LWIPDIR)/netif/ppp/magic.c \
   $(LWIPDIR)/netif/ppp/chap_ms.c \
   $(LWIPDIR)/netif/ppp/pppcrypt.c \
   $(LWIPDIR)/netif/ppp/multilink.c \
-  $(LWIPDIR)/netif/ppp/ppp_oe.c \
+  $(LWIPDIR)/netif/ppp/pppoe.c \
   $(LWIPDIR)/netif/ppp/ppp.c \
   $(LWIPDIR)/netif/ppp/vj.c \
-  $(LWIPDIR)/netif/ppp/polarssl/lwip_md4.c \
-  $(LWIPDIR)/netif/ppp/polarssl/lwip_md5.c \
-  $(LWIPDIR)/netif/ppp/polarssl/lwip_sha1.c \
-  $(LWIPDIR)/netif/ppp/polarssl/lwip_des.c \
+  $(LWIPDIR)/netif/ppp/polarssl/md4.c \
+  $(LWIPDIR)/netif/ppp/polarssl/md5.c \
+  $(LWIPDIR)/netif/ppp/polarssl/sha1.c \
+  $(LWIPDIR)/netif/ppp/polarssl/des.c \
   $(LWIPDIR)/netif/ppp/eui64.c \
-  $(LWIPDIR)/netif/ppp/ipv6cp.c
+  $(LWIPDIR)/netif/ppp/ipv6cp.c \
+  $(LWIPDIR)/netif/ppp/pppol2tp.c \
+  $(LWIPDIR)/netif/ppp/pppos.c
 
 #  $(LWIPDIR)/netif/ppp/vj.c \
 

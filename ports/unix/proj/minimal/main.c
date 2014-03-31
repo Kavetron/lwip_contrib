@@ -50,6 +50,8 @@
 #include "lwip/tcp_impl.h"
 #include "mintapif.h"
 #include "netif/etharp.h"
+#include "lwip/pppapi.h"
+#include "lwip/netifapi.h"
 
 #include "timer.h"
 #include <signal.h>
@@ -58,7 +60,6 @@
 #include "private_mib.h"
 
 #include "lwip/tcpip.h"
-#include "ppp.h"
 
 #include "netif/sio.h"
 
@@ -126,7 +127,7 @@ void ppp_link_status_cb(ppp_pcb *pcb, int err_code, void *ctx) {
 
 	switch(err_code) {
 		case PPPERR_NONE: {             /* No error. */
-			struct ppp_addrs *ppp_addrs = &pcb->addrs;
+			struct ppp_addrs *ppp_addrs = ppp_addrs(pcb);
 			fprintf(stderr, "ppp_link_status_cb: PPPERR_NONE\n\r");
 			fprintf(stderr, "   our_ipaddr  = %s\n\r", ip_ntoa(&ppp_addrs->our_ipaddr));
 			fprintf(stderr, "   his_ipaddr  = %s\n\r", ip_ntoa(&ppp_addrs->his_ipaddr));
@@ -169,7 +170,7 @@ void ppp_link_status_cb(ppp_pcb *pcb, int err_code, void *ctx) {
 		}
 		case PPPERR_PROTOCOL: {        /* Failed to meet protocol. */
 			fprintf(stderr, "ppp_link_status_cb: PPPERR_PROTOCOL\n\r");
-/*			ppp_desc = ppp_over_ethernet_open(&MACB_if, NULL, NULL, ppp_link_status_cb, NULL);
+/*			ppp_desc = pppapi_over_ethernet_open(&MACB_if, NULL, NULL, ppp_link_status_cb, NULL);
 			printf("ppp_desc = %d\n\r", ppp_desc); */
 			break;
 		}
@@ -177,6 +178,13 @@ void ppp_link_status_cb(ppp_pcb *pcb, int err_code, void *ctx) {
 			fprintf(stderr, "ppp_link_status_cb: unknown err code %d\n\r", err_code);
 			break;
 		}
+	}
+
+	if(err_code != PPPERR_NONE) {
+		ppp_open(pcb, 5); 
+/*		printf("ppp_free(pcb) = %d\n", ppp_free(pcb)); */
+/*		printf("ppp_delete(pcb) = %d\n", ppp_delete(pcb)); */
+		/* printf("ppp_open(pcb, 5) = %d\n", ppp_open(pcb, 5)); */
 	}
 
 /*	if(errCode != PPPERR_NONE) {
@@ -226,8 +234,14 @@ main(int argc, char **argv)
   sys_sem_t sem;
   char *username = "essai", *password = "aon0viipheehooX";
   char *username2 = "essai2", *password2 = "aon0viipheehooX";
-  ppp_pcb *ppp, *ppp2, *ppps;
-  sio_status_t *ser;
+  ppp_pcb *ppp = NULL, *ppp2 = NULL;
+#if PPPOL2TP_SUPPORT
+  ppp_pcb *pppl2tp = NULL;
+#endif
+#if PPPOS_SUPPORT
+  ppp_pcb *ppps = NULL;
+  sio_status_t *ser = NULL;
+#endif /* PPPOS_SUPPORT */
   int coin = 0;
 
   /* startup defaults (may be overridden by one or more opts) */
@@ -293,16 +307,16 @@ main(int argc, char **argv)
 
   fprintf(stderr, "TCP/IP initialized.\n");
 
-  netif_add(&netif, &ipaddr, &netmask, &gw, NULL, mintapif_init, ethernet_input);
-/*  netif_set_default(&netif); */
-  netif_set_up(&netif);
+  netifapi_netif_add(&netif, &ipaddr, &netmask, &gw, NULL, mintapif_init, tcpip_input);
+  /* netifapi_set_default(&netif); */
+  netifapi_netif_set_up(&netif);
 
   IP4_ADDR(&gw, 192,168,1,1);
   IP4_ADDR(&ipaddr, 192,168,1,2);
   IP4_ADDR(&netmask, 255,255,255,0);
 
-  netif_add(&netif2, &ipaddr, &netmask, &gw, NULL, mintapif_init, ethernet_input);
-  netif_set_up(&netif2);
+  netifapi_netif_add(&netif2, &ipaddr, &netmask, &gw, NULL, mintapif_init, tcpip_input);
+  netifapi_netif_set_up(&netif2);
 
 #if LWIP_IPV6
   /* netif_create_ip6_linklocal_address(&netif, 1); */
@@ -331,11 +345,15 @@ main(int argc, char **argv)
   timer_set_interval(TIMER_EVT_IPREASSTMR, IP_TMR_INTERVAL / 10);
 #endif
 
-	ppp_init();
-
-	ppp = ppp_new();
-	ppp2 = ppp_new();
-	ppps = ppp_new();
+	ppp = pppapi_new();
+	ppp2 = pppapi_new();
+#if PPPOS_SUPPORT
+	ppps = pppapi_new();
+#endif
+#if PPPOL2TP_SUPPORT
+	pppl2tp = pppapi_new();
+	pppapi_set_default(pppl2tp);
+#endif
 
 #if PPP_DEBUG
 	fprintf(stderr, "ppp = %d\n", ppp->num);
@@ -343,19 +361,39 @@ main(int argc, char **argv)
 #endif
 	fprintf(stderr, "ppp_pcb sizeof(ppp) = %ld\n", sizeof(ppp_pcb));
 
-	ppp_set_auth(ppp, PPPAUTHTYPE_EAP, username, password);
-	ppp_over_ethernet_open(ppp, &netif, NULL, NULL, ppp_link_status_cb, NULL);
+	pppapi_set_auth(ppp, PPPAUTHTYPE_EAP, username, password);
+#if PPPOE_SUPPORT
+	pppapi_over_ethernet_create(ppp, &netif, NULL, NULL, ppp_link_status_cb, NULL);
+	pppapi_open(ppp, 0);
+#endif
 
-	ppp_set_auth(ppp2, PPPAUTHTYPE_MSCHAP, username2, password2);
-	ppp_over_ethernet_open(ppp2, &netif2, NULL, NULL, ppp_link_status_cb, NULL);
-
+	pppapi_set_auth(ppp2, PPPAUTHTYPE_MSCHAP, username2, password2);
+	/* pppapi_over_ethernet_open(ppp2, &netif2, NULL, NULL, ppp_link_status_cb, NULL); */
+#if PPPOS_SUPPORT
 	ser = sio_open(2);
 	fprintf(stderr, "SIO FD = %d\n", ser->fd);
-	usleep(100000); /* wait a little bit for forked pppd to be ready */
+	sys_msleep(100); /* wait a little bit for forked pppd to be ready */
 
-	ppp_set_auth(ppps, PPPAUTHTYPE_PAP, username2, password2);
-	ppp_over_serial_open(ppps, ser, ppp_link_status_cb, NULL);
-	        
+	pppapi_set_auth(ppps, PPPAUTHTYPE_PAP, username2, password2);
+	pppapi_over_serial_create(ppps, ser, ppp_link_status_cb, NULL);
+	ppp_open(ppps, 0);
+#endif
+
+#if PPPOL2TP_SUPPORT
+	{
+		ip_addr_t l2tpserv;
+/*		sys_msleep(5000); */
+		fprintf(stderr, "L2TP Started\n");
+		l2tpserv.addr = PP_HTONL(0xC0A80101); /* 192.168.1.1 */
+		l2tpserv.addr = PP_HTONL(0xC0A804fe); /* 192.168.4.254 */
+		l2tpserv.addr = PP_HTONL(0x0A010A00); /* 10.1.10.0 */
+		pppapi_set_auth(pppl2tp, PPPAUTHTYPE_EAP, username2, password2);
+		pppapi_over_l2tp_create(pppl2tp, ppp_netif(ppp), &l2tpserv, 1701, (u8_t*)"ahah", 4, ppp_link_status_cb, NULL);
+		ppp_open(pppl2tp, 0);
+		/* pppapi_over_l2tp_open(pppl2tp, NULL, &l2tpserv, 1701, NULL, 0, ppp_link_status_cb, NULL); */
+	}
+#endif
+
 #if 0
 	/* start pppd */
 	switch(fork()) {
@@ -376,7 +414,11 @@ main(int argc, char **argv)
 	}
 #endif
   fprintf(stderr, "Applications started.\n");
-    
+#if 0
+  while (1) {
+	mintapif_wait(&netif, 0xFFFF);
+  } 
+#endif
   while (1) {
     fd_set fdset;
     struct timeval tv;
@@ -399,7 +441,7 @@ main(int argc, char **argv)
 #if 0
     FD_SET(from_pppd[0], &fdset);
 #endif
-#if !PPP_INPROC_MULTITHREADED
+#if PPPOS_SUPPORT && !PPP_INPROC_OWNTHREAD
     if(ser) {
       FD_SET(ser->fd, &fdset);
       maxfd = LWIP_MAX(maxfd, ser->fd);
@@ -415,21 +457,29 @@ main(int argc, char **argv)
       if( FD_ISSET(from_pppd[0], &fdset) )
         sio_input(ppps);
 #endif
-#if !PPP_INPROC_MULTITHREADED 
-      if(ser && FD_ISSET(ser->fd, &fdset) ) {
+#if PPPOS_SUPPORT && !PPP_INPROC_OWNTHREAD
+      if(ppps && ser && FD_ISSET(ser->fd, &fdset) ) {
         u8_t buffer[128];
         int len;
         len = sio_read(ser, buffer, 128);
-        pppos_input(ppps, buffer, len);
+	if(len < 0) {
+	  pppapi_sighup(ppps);
+	  ser = NULL;
+	} else {
+          pppos_input(ppps, buffer, len);
+	}
       }
 #endif /* PPP_INPROC_MULTITHREADED */
     }
 
 	coin++;
         if(!(coin%1000)) fprintf(stderr, "COIN %d\n", coin);
-	if(coin == 4000) {
-		/* ppp_close(ppp); */
-		ppp = NULL;
+	if(coin == 2000) {
+#if PPPOE_SUPPORT
+		pppapi_close(ppp);
+#endif
+		/* pppapi_close(ppps); */
+		/* printf("pppapi_close(ppp) = %d\n", pppapi_close(ppp)); */
 	}
   }
 

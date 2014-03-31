@@ -325,7 +325,7 @@ sio_status_t * sio_open( int devnum )
 		execl("/usr/sbin/pppd", "pppd",
 			"ms-dns", "198.168.100.7",
 			"local", "crtscts",
-			"debug",
+			"debug", "asyncmap", "12345678",
 #if PPP_IPV6_SUPPORT
 			"+ipv6",
 #endif

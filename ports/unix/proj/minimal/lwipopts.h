@@ -69,6 +69,13 @@
  */
 #define MEM_SIZE                        16000
 
+/*
+ * enable SYS_LIGHTWEIGHT_PROT in lwipopts.h if you want inter-task protection
+ * for certain critical regions during buffer allocation, deallocation and memory
+ * allocation and deallocation.
+ */
+#define SYS_LIGHTWEIGHT_PROT            1
+
 
 /*
    ------------------------------------------------
@@ -99,7 +106,7 @@
  * MEMP_NUM_TCP_PCB: the number of simulatenously active TCP connections.
  * (requires the LWIP_TCP option)
  */
-#define MEMP_NUM_TCP_PCB                2
+#define MEMP_NUM_TCP_PCB                16
 
 /**
  * MEMP_NUM_TCP_PCB_LISTEN: the number of listening TCP connections.
@@ -398,10 +405,9 @@
 #define LWIP_IPV6_FRAG  1
 
 
-#define SIO_DEBUG LWIP_DBG_ON
+#define SIO_DEBUG LWIP_DBG_OFF
 #define PPP_DEBUG LWIP_DBG_ON
 #define IP6_DEBUG LWIP_DBG_OFF
-
 
 /*
    ---------------------------------
@@ -421,8 +427,22 @@
 /**
  * PPPOS_SUPPORT==1: Enable PPP Over Serial
  */
-#define PPPOS_SUPPORT                   1
+#define PPPOS_SUPPORT                 	1
 
+#define PPPOL2TP_SUPPORT                1
+#define PPPOL2TP_AUTH_SUPPORT           1
+
+/**
+ * pbuf_type PPP is using for LCP, PAP, CHAP, EAP, IPCP and IP6CP packets.
+ *
+ * Memory allocated must be single buffered for PPP to works, it requires pbuf
+ * that are not going to be chained when allocated. This requires setting
+ * PBUF_POOL_BUFSIZE to at least 512 bytes, which is quite huge for small systems.
+ *
+ * Setting PPP_USE_PBUF_RAM to 1 makes PPP use memory from heap where continuous
+ * buffer are required, allowing you to use a smaller PBUF_POOL_BUFSIZE.
+ */
+#define PPP_USE_PBUF_RAM                1
 
 /**
  * NUM_PPP: Max PPP sessions.
@@ -467,7 +487,7 @@
 /**
  * VJ_SUPPORT==1: Support VJ header compression.
  */
-#define VJ_SUPPORT                      1
+#define VJ_SUPPORT                      0
 
 /**
  * PPP_MD5_RANDM==1: Use MD5 for better randomness.
@@ -481,11 +501,23 @@
 
 #define PPP_IPV6_SUPPORT 1
 
-#define PPP_SERVER 0 
+#define PPP_SERVER 1
 
 #define MEMP_NUM_PPP_PCB 10
 #define MEMP_NUM_PPPOE_INTERFACES 10
 
 #define PPP_INPROC_MULTITHREADED 1
-#define PPP_INPROC_OWNTHREAD 1
+
+#define PPP_FCS_TABLE 0
+
+#define LWIP_PPP_API 1
+
+#define LWIP_NETIF_STATUS_CALLBACK 1
+#define LWIP_NETIF_LINK_CALLBACK 1
+
+#define LWIP_NETIF_API 1
+
+#define TCP_MSS 1400
+/* #define TCP_WND 8400 */
+
 #endif /* __LWIPOPTS_H__ */
